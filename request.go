@@ -9,13 +9,12 @@ import (
 )
 
 // RequestOption modifies a request.
-type RequestOption func(req *http.Request) error
+type RequestOption func(req *http.Request)
 
 // URLParams sets the URL parameters of the request.
 func URLParams(v url.Values) RequestOption {
-	return func(req *http.Request) error {
+	return func(req *http.Request) {
 		req.URL.RawQuery += v.Encode()
-		return nil
 	}
 }
 
@@ -25,9 +24,8 @@ func (t T) Request(method Method, body io.Reader, opts ...RequestOption) *Respon
 	req, err := http.NewRequest(string(method), t.URL, body)
 	require.NoError(t, err, "failed to create request")
 
-	for i, opt := range opts {
-		err = opt(req)
-		require.NoError(t, err, "failed to apply opt %v", i)
+	for _, opt := range opts {
+		opt(req)
 	}
 
 	t.Logf("%v %v", req.Method, req.URL)
@@ -41,9 +39,8 @@ func (t T) Request(method Method, body io.Reader, opts ...RequestOption) *Respon
 
 // RequestURL sends a request with endpoint appended to the internal URL.
 func (t T) RequestURL(method Method, endpoint string, body io.Reader, opts ...RequestOption) *Response {
-	opts = append(opts, func(r *http.Request) error {
+	opts = append(opts, func(r *http.Request) {
 		r.URL.Path += endpoint
-		return nil
 	})
 	return t.Request(method, body, opts...)
 }

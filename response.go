@@ -31,7 +31,7 @@ func (r Response) DuplicateBody() io.Reader {
 
 // Assert runs each assertion against the response.
 // It closes the response body after all of the assertions have ran.
-func (r Response) Assert(t T, assertions ...ResponseAssertion) {
+func (r Response) Assert(assertions ...ResponseAssertion) {
 	defer r.Body.Close()
 
 	for _, a := range assertions {

@@ -6,8 +6,22 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/stretchr/testify/assert"
 )
+
+func TestBody(t *testing.T) {
+	req, err := http.NewRequest("GET", "google.com", nil)
+	require.NoError(t, err)
+
+	Body(strings.NewReader("test123"))(req)
+
+	byt, err := ioutil.ReadAll(req.Body)
+	require.NoError(t, err)
+
+	assert.Equal(t, []byte("test123"), byt)
+}
 
 func TestResponse(t *testing.T) {
 	resp := Response{
@@ -24,5 +38,4 @@ func TestResponse(t *testing.T) {
 			assert.Equal(t, "howdy", string(resp.DuplicateBody()))
 		}
 	})
-
 }

@@ -18,16 +18,14 @@ func TestT(tt *testing.T) {
 	t := New(tt, "http://"+addr)
 
 	t.Run("Run Creates deep copy", func(dt T) {
-		t.Headers.Add("hello", "world")
-		assert.Empty(t, dt.Headers.Get("hello"))
+		dt.URL = "testing"
+		assert.NotEqual(t, dt.URL, t.URL)
 	})
 
 	t.Run("RunURL Creates deep copy, and appends to URL", func(t T) {
 		t.RunURL("/deeper", func(dt T) {
-			t.Headers.Add("hello2", "world")
-			assert.Empty(t, dt.Headers.Get("hello2"))
-
 			assert.Equal(t, "http://"+addr+"/deeper", dt.URL)
+			assert.NotEqual(t, dt.URL, t.URL)
 		})
 	})
 }

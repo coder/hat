@@ -40,7 +40,7 @@ func (t T) Run(name string, fn func(t T)) {
 // It uses segment as the name of the subtest.
 func (t T) RunURL(segment string, fn func(t T)) {
 	t.Run(segment, func(t T) {
-		t.URL += segment
+		t.URL = urlJoin(t.URL, segment)
 		fn(t)
 	})
 }

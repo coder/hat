@@ -53,7 +53,7 @@ func (t T) Request(method Method, opts ...RequestOption) *Response {
 // RequestURL sends a request with endpoint appended to the internal URL.
 func (t T) RequestURL(method Method, endpoint string, opts ...RequestOption) *Response {
 	opts = append(opts, func(r *http.Request) {
-		r.URL.Path += endpoint
+		r.URL.Path = urlJoin(r.URL.Path, endpoint)
 	})
 	return t.Request(method, opts...)
 }

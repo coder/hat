@@ -2,7 +2,6 @@ package hat
 
 import (
 	"bytes"
-	"io"
 	"io/ioutil"
 	"net/http"
 
@@ -18,15 +17,15 @@ type Response struct {
 	t T
 }
 
-// DuplicateBody creates a duplicate body reader and returns it.
-func (r Response) DuplicateBody() io.Reader {
+// DuplicateBody reads in the response body.
+// It replaces the underlying body with a duplicate.
+func (r Response) DuplicateBody() []byte {
 	byt, err := ioutil.ReadAll(r.Body)
 	require.NoError(r.t, err, "failed to read body")
 
-	var dupRd io.Reader
-	r.Response.Body, dupRd = ioutil.NopCloser(bytes.NewReader(byt)), ioutil.NopCloser(bytes.NewReader(byt))
+	r.Response.Body = ioutil.NopCloser(bytes.NewReader(byt))
 
-	return dupRd
+	return byt
 }
 
 // Assert runs each assertion against the response.

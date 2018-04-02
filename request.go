@@ -21,13 +21,7 @@ func URLParams(v url.Values) RequestOption {
 
 // Body sets the body of a request.
 func Body(r io.Reader) RequestOption {
-	var (
-		rdc io.ReadCloser
-		ok  bool
-	)
-
-	rdc, ok = r.(io.ReadCloser)
-
+	rdc, ok := r.(io.ReadCloser)
 	if !ok {
 		rdc = ioutil.NopCloser(r)
 	}

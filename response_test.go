@@ -35,7 +35,7 @@ func TestResponse(tt *testing.T) {
 
 	t := New(tt, "http://"+addr)
 
-	resp := t.Request(GET, func(req *http.Request) {
+	resp := t.Get(func(req *http.Request) {
 		req.Body = ioutil.NopCloser(strings.NewReader("howdy"))
 	})
 

@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/stretchr/testify/require"
 )
@@ -49,7 +50,9 @@ func (t T) sendRequest(createRequest func() *http.Request) Response {
 
 // Request sends an HTTP request to the endpoint.
 // body may be nil.
-func (t T) Request(method Method, opts ...RequestOption) Response {
+func (t T) Request(method string, opts ...RequestOption) Response {
+	method = strings.ToUpper(method)
+
 	return t.sendRequest(func() *http.Request {
 		req, err := http.NewRequest(string(method), t.URL, nil)
 		require.NoError(t, err, "failed to create request")
@@ -62,9 +65,52 @@ func (t T) Request(method Method, opts ...RequestOption) Response {
 }
 
 // RequestPath sends a request with endpoint appended to the internal URL.
-func (t T) RequestPath(method Method, endpoint string, opts ...RequestOption) Response {
+func (t T) RequestPath(method string, endpoint string, opts ...RequestOption) Response {
 	opts = append(opts, func(r *http.Request) {
 		r.URL.Path = urlJoin(r.URL.Path, endpoint)
 	})
 	return t.Request(method, opts...)
+}
+
+func (t T) Get(opts ...RequestOption) Response {
+	return t.Request("Get", opts...)
+}
+
+func (t T) GetPath(path string, opts ...RequestOption) Response {
+	return t.RequestPath("Get", path, opts...)
+}
+
+func (t T) Head(opts ...RequestOption) Response {
+	return t.Request("Head", opts...)
+}
+func (t T) HeadPath(path string, opts ...RequestOption) Response {
+	return t.RequestPath("Head", path, opts...)
+}
+
+func (t T) Post(opts ...RequestOption) Response {
+	return t.Request("Post", opts...)
+}
+func (t T) PostPath(path string, opts ...RequestOption) Response {
+	return t.RequestPath("Post", path, opts...)
+}
+
+func (t T) Put(opts ...RequestOption) Response {
+	return t.Request("Put", opts...)
+}
+func (t T) PutPath(path string, opts ...RequestOption) Response {
+	return t.RequestPath("Put", path, opts...)
+}
+
+func (t T) Patch(opts ...RequestOption) Response {
+	return t.Request("Patch", opts...)
+}
+func (t T) PatchPath(path string, opts ...RequestOption) Response {
+	return t.RequestPath("Patch", path, opts...)
+}
+
+func (t T) Delete(opts ...RequestOption) Response {
+	return t.Request("Delete", opts...)
+}
+func (t T) DeletePath(path string, opts ...RequestOption) Response {
+	return t.RequestPath("Delete", path, opts...)
 }

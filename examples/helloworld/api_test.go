@@ -17,7 +17,7 @@ func TestAPI(tt *testing.T) {
 	t := hat.New(tt, "http://"+addr)
 
 	t.Run("Hello Echo single-parent chain", func(t hat.T) {
-		r := t.Request(hat.GET).Assert(
+		r := t.Get().Assert(
 			func(r hat.Response) {
 				byt := hat.DuplicateBody(t, r)
 				assert.Equal(t, "Hello /", string(byt))

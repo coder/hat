@@ -53,6 +53,9 @@ func (r Response) Assert(assertions ...ResponseAssertion) Response {
 // Again applies opts to the request that created this response,
 // then sends it again.
 // It returns a completely new response.
+// If Again is chained, all of the request options in the chain will be applied.
+// If multiple Agains are called off of a single parent response, only the options
+// from the leaf and the parent will be applied.
 func (r Response) Again(t T, opts ...RequestOption) Response {
 	return t.sendRequest(func() *http.Request {
 		req := r.createRequest()

@@ -45,13 +45,13 @@ func TestResponse(tt *testing.T) {
 		}
 	})
 
-	t.Run("But", func(t T) {
+	t.Run("Again", func(t T) {
 		for i := 0; i < 3; i++ {
 			t.Logf("Iteration %v", i)
 			resp.Again(
 				t,
 				func(req *http.Request) {
-					// Ensure request is being copied for every But.
+					// Ensure request is being copied for every Again.
 					req.URL.Path += "/a"
 					require.Equal(t, "/a", req.URL.Path)
 					req.Body = ioutil.NopCloser(strings.NewReader("a"))

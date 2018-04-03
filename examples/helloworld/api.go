@@ -10,8 +10,7 @@ type API struct {
 
 func (a *API) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	if len(req.URL.Path) > 9 {
-		rw.WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(rw, "Path too long")
+		http.Error(rw, "Path too long", http.StatusBadRequest)
 		return
 	}
 

@@ -21,7 +21,6 @@ func TestAPI(tt *testing.T) {
 			func(r hat.Response) {
 				byt := hat.DuplicateBody(t, r)
 				assert.Equal(t, "Hello /", string(byt))
-
 			},
 		)
 

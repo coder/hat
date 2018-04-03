@@ -17,20 +17,24 @@ func TestAPI(tt *testing.T) {
 	t := hat.New(tt, "http://"+addr)
 
 	t.Run("Hello Echo single-parent chain", func(t hat.T) {
-		r := t.Get().Assert(
-			func(r hat.Response) {
+		req := t.Get()
+
+		req.Send(t).Assert(
+			t,
+			func(t hat.T, r hat.Response) {
 				byt := t.DuplicateBody(r)
 				assert.Equal(t, "Hello /", string(byt))
 			},
 		)
 
 		t.Run("underscore", func(t hat.T) {
-			r.Again(t,
+			req.Clone(t,
 				hat.Path("/1234567890"),
-			).Assert(
-				func(r hat.Response) {
+			).Send(t).Assert(
+				t,
+				func(t hat.T, r hat.Response) {
 					byt := t.DuplicateBody(r)
-					assert.Equal(t, "Path too long", string(byt))
+					assert.Equal(t, "Path too long\n", string(byt))
 				},
 				hatassert.StatusEqual(t, http.StatusBadRequest),
 			)

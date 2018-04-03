@@ -14,7 +14,7 @@ func TestURLParams(t *testing.T) {
 	require.NoError(t, err)
 	URLParams(url.Values{
 		"q": []string{"sean"},
-	})(req)
+	})(T{}, req)
 
 	assert.Equal(t, "http://google.com?q=sean", req.URL.String())
 }

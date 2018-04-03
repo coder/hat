@@ -9,7 +9,7 @@ import (
 
 // StatusEqual ensures the response status equals expected.
 func StatusEqual(t testing.TB, expected int) hat.ResponseAssertion {
-	return func(r hat.Response) {
+	return func(t hat.T, r hat.Response) {
 		assert.Equal(t, expected, r.StatusCode)
 	}
 }

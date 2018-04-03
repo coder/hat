@@ -31,6 +31,18 @@ func Body(r io.Reader) RequestOption {
 	}
 }
 
+func (t T) sendRequest(req *http.Request) *Response {
+	t.Logf("%v %v", req.Method, req.URL)
+	resp, err := t.Client.Do(req)
+	require.NoError(t, err, "failed to send request")
+
+	return &Response{
+		Response: resp,
+		req:      req,
+		t:        t,
+	}
+}
+
 // Request sends an HTTP request to the endpoint.
 // body may be nil.
 func (t T) Request(method Method, opts ...RequestOption) *Response {
@@ -41,13 +53,7 @@ func (t T) Request(method Method, opts ...RequestOption) *Response {
 		opt(req)
 	}
 
-	t.Logf("%v %v", req.Method, req.URL)
-	resp, err := t.Client.Do(req)
-	require.NoError(t, err, "failed to send request")
-
-	return &Response{
-		Response: resp,
-	}
+	return t.sendRequest(req)
 }
 
 // RequestURL sends a request with endpoint appended to the internal URL.

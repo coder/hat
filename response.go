@@ -25,6 +25,8 @@ func CombineResponseAssertions(asserts ...ResponseAssertion) ResponseAssertion {
 type Response struct {
 	*http.Response
 	t T
+
+	req *http.Request
 }
 
 // DuplicateBody reads in the response body.
@@ -40,10 +42,21 @@ func (r Response) DuplicateBody() []byte {
 
 // Assert runs each assertion against the response.
 // It closes the response body after all of the assertions have ran.
-func (r Response) Assert(assertions ...ResponseAssertion) {
+func (r Response) Assert(assertions ...ResponseAssertion) *Response {
 	defer r.Body.Close()
 
 	for _, a := range assertions {
 		a(r)
 	}
+	return &r
+}
+
+// But applies opts to the request that created this response,
+// then sends it again.
+func (r Response) But(opts ...RequestOption) *Response {
+	for _, o := range opts {
+		o(r.req)
+	}
+
+	return r.t.sendRequest(r.req)
 }

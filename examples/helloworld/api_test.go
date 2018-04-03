@@ -19,7 +19,7 @@ func TestAPI(tt *testing.T) {
 	t.Run("Hello Echo single-parent chain", func(t hat.T) {
 		r := t.Get().Assert(
 			func(r hat.Response) {
-				byt := hat.DuplicateBody(t, r)
+				byt := t.DuplicateBody(r)
 				assert.Equal(t, "Hello /", string(byt))
 			},
 		)
@@ -29,7 +29,7 @@ func TestAPI(tt *testing.T) {
 				hat.Path("/1234567890"),
 			).Assert(
 				func(r hat.Response) {
-					byt := hat.DuplicateBody(t, r)
+					byt := t.DuplicateBody(r)
 					assert.Equal(t, "Path too long", string(byt))
 				},
 				hatassert.StatusEqual(t, http.StatusBadRequest),

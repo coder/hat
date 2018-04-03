@@ -1,6 +1,8 @@
 package hat
 
 import (
+	"bytes"
+	"io/ioutil"
 	"net/http"
 	"testing"
 	"time"
@@ -28,6 +30,19 @@ func New(t *testing.T, URL string) *T {
 		URL:    URL,
 		Client: client,
 	}
+}
+
+// DuplicateBody reads in the response body.
+// It replaces the underlying body with a duplicate.
+func (t T) DuplicateBody(r Response) []byte {
+	byt, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		t.Fatalf("failed to read body: %v", err)
+	}
+
+	r.Response.Body = ioutil.NopCloser(bytes.NewReader(byt))
+
+	return byt
 }
 
 // Run creates a subtest.

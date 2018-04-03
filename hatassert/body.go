@@ -2,7 +2,6 @@ package hatassert
 
 import (
 	"regexp"
-	"testing"
 
 	"github.com/stretchr/testify/require"
 
@@ -11,19 +10,19 @@ import (
 )
 
 // BodyEqual checks if the response body equals expects.
-func BodyEqual(t testing.TB, expects []byte) hat.ResponseAssertion {
+func BodyEqual(t hat.T, expects []byte) hat.ResponseAssertion {
 	return func(r hat.Response) {
-		assert.Equal(t, expects, hat.DuplicateBody(t, r))
+		assert.Equal(t, expects, t.DuplicateBody(r))
 	}
 }
 
 // BodyMatches ensures the response body matches the regex described by expr.
-func BodyMatches(t testing.TB, expr string) hat.ResponseAssertion {
+func BodyMatches(t hat.T, expr string) hat.ResponseAssertion {
 	rg, err := regexp.Compile(expr)
 	require.NoError(t, err)
 
 	return func(r hat.Response) {
-		byt := hat.DuplicateBody(t, r)
+		byt := t.DuplicateBody(r)
 		if !rg.Match(byt) {
 			t.Errorf("body %s does not match expr %v", byt, rg.String())
 		}

@@ -1,10 +1,7 @@
 package hat
 
 import (
-	"bytes"
-	"io/ioutil"
 	"net/http"
-	"testing"
 )
 
 // ResponseAssertion asserts a quality of the response.
@@ -25,19 +22,6 @@ type Response struct {
 	*http.Response
 
 	createRequest func() *http.Request
-}
-
-// DuplicateBody reads in the response body.
-// It replaces the underlying body with a duplicate.
-func DuplicateBody(t testing.TB, r Response) []byte {
-	byt, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		t.Fatalf("failed to read body: %v", err)
-	}
-
-	r.Response.Body = ioutil.NopCloser(bytes.NewReader(byt))
-
-	return byt
 }
 
 // Assert runs each assertion against the response.

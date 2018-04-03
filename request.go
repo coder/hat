@@ -20,6 +20,13 @@ func URLParams(v url.Values) RequestOption {
 	}
 }
 
+// Path appends path to the URL.
+func Path(path string) RequestOption {
+	return func(req *http.Request) {
+		req.URL.Path += path
+	}
+}
+
 // Body sets the body of a request.
 func Body(r io.Reader) RequestOption {
 	rdc, ok := r.(io.ReadCloser)
@@ -64,53 +71,26 @@ func (t T) Request(method string, opts ...RequestOption) Response {
 	})
 }
 
-// RequestPath sends a request with endpoint appended to the internal URL.
-func (t T) RequestPath(method string, endpoint string, opts ...RequestOption) Response {
-	opts = append(opts, func(r *http.Request) {
-		r.URL.Path = urlJoin(r.URL.Path, endpoint)
-	})
-	return t.Request(method, opts...)
-}
-
 func (t T) Get(opts ...RequestOption) Response {
 	return t.Request("Get", opts...)
-}
-
-func (t T) GetPath(path string, opts ...RequestOption) Response {
-	return t.RequestPath("Get", path, opts...)
 }
 
 func (t T) Head(opts ...RequestOption) Response {
 	return t.Request("Head", opts...)
 }
-func (t T) HeadPath(path string, opts ...RequestOption) Response {
-	return t.RequestPath("Head", path, opts...)
-}
 
 func (t T) Post(opts ...RequestOption) Response {
 	return t.Request("Post", opts...)
-}
-func (t T) PostPath(path string, opts ...RequestOption) Response {
-	return t.RequestPath("Post", path, opts...)
 }
 
 func (t T) Put(opts ...RequestOption) Response {
 	return t.Request("Put", opts...)
 }
-func (t T) PutPath(path string, opts ...RequestOption) Response {
-	return t.RequestPath("Put", path, opts...)
-}
 
 func (t T) Patch(opts ...RequestOption) Response {
 	return t.Request("Patch", opts...)
 }
-func (t T) PatchPath(path string, opts ...RequestOption) Response {
-	return t.RequestPath("Patch", path, opts...)
-}
 
 func (t T) Delete(opts ...RequestOption) Response {
 	return t.Request("Delete", opts...)
-}
-func (t T) DeletePath(path string, opts ...RequestOption) Response {
-	return t.RequestPath("Delete", path, opts...)
 }

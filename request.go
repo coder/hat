@@ -42,8 +42,8 @@ func (t T) sendRequest(createRequest func() *http.Request) Response {
 	require.NoError(t, err, "failed to send request")
 
 	return Response{
-		Response:               resp,
-		createDuplicateRequest: createRequest,
+		Response:      resp,
+		createRequest: createRequest,
 	}
 }
 

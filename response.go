@@ -24,7 +24,7 @@ func CombineResponseAssertions(asserts ...ResponseAssertion) ResponseAssertion {
 type Response struct {
 	*http.Response
 
-	createDuplicateRequest func() *http.Request
+	createRequest func() *http.Request
 }
 
 // DuplicateBody reads in the response body.
@@ -55,7 +55,7 @@ func (r Response) Assert(assertions ...ResponseAssertion) Response {
 // It returns a completely new response.
 func (r Response) But(t T, opts ...RequestOption) Response {
 	return t.sendRequest(func() *http.Request {
-		req := r.createDuplicateRequest()
+		req := r.createRequest()
 		for _, o := range opts {
 			o(req)
 		}

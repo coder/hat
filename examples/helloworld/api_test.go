@@ -26,12 +26,12 @@ func TestAPI(tt *testing.T) {
 		)
 
 		t.Run("underscore", func(t hat.T) {
-			r.But(t, func(req *http.Request) {
+			r.Again(t, func(req *http.Request) {
 				req.URL.Path = "/1234567890"
 			}).Assert(
 				func(r hat.Response) {
 					byt := hat.DuplicateBody(t, r)
-					assert.Equal(t, "Body too long", string(byt))
+					assert.Equal(t, "Path too long", string(byt))
 				},
 				hatassert.StatusEqual(t, http.StatusBadRequest),
 			)

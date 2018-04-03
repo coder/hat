@@ -50,10 +50,10 @@ func (r Response) Assert(assertions ...ResponseAssertion) Response {
 	return r
 }
 
-// But applies opts to the request that created this response,
+// Again applies opts to the request that created this response,
 // then sends it again.
 // It returns a completely new response.
-func (r Response) But(t T, opts ...RequestOption) Response {
+func (r Response) Again(t T, opts ...RequestOption) Response {
 	return t.sendRequest(func() *http.Request {
 		req := r.createRequest()
 		for _, o := range opts {

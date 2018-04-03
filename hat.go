@@ -3,6 +3,7 @@ package hat
 import (
 	"net/http"
 	"testing"
+	"time"
 )
 
 // T represents a test instance.
@@ -19,10 +20,13 @@ type T struct {
 
 // New creates a T from a testing.T.
 func New(t *testing.T, URL string) *T {
+	client := &http.Client{
+		Timeout: time.Second * 5,
+	}
 	return &T{
 		T:      t,
 		URL:    URL,
-		Client: http.DefaultClient,
+		Client: client,
 	}
 }
 

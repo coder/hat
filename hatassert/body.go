@@ -13,7 +13,7 @@ import (
 // BodyEqual checks if the response body equals expects.
 func BodyEqual(t testing.TB, expects []byte) hat.ResponseAssertion {
 	return func(r hat.Response) {
-		assert.Equal(t, expects, r.DuplicateBody())
+		assert.Equal(t, expects, hat.DuplicateBody(t, r))
 	}
 }
 
@@ -23,7 +23,7 @@ func BodyMatches(t testing.TB, expr string) hat.ResponseAssertion {
 	require.NoError(t, err)
 
 	return func(r hat.Response) {
-		byt := r.DuplicateBody()
+		byt := hat.DuplicateBody(t, r)
 		if !rg.Match(byt) {
 			t.Errorf("body %s does not match expr %v", byt, rg.String())
 		}

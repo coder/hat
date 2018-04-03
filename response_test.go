@@ -1,12 +1,14 @@
 package hat
 
 import (
+	"io"
 	"io/ioutil"
 	"net/http"
 	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"go.coder.com/ctest/chttptest"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -23,19 +25,42 @@ func TestBody(t *testing.T) {
 	assert.Equal(t, []byte("test123"), byt)
 }
 
-func TestResponse(t *testing.T) {
-	resp := Response{
-		Response: &http.Response{
-			Body: ioutil.NopCloser(strings.NewReader("howdy")),
-		},
-		t: T{
-			T: t,
-		},
-	}
+func TestResponse(tt *testing.T) {
+	tt.Parallel()
 
-	t.Run("DuplicateBody", func(t *testing.T) {
+	addr, close := chttptest.StartHTTPServer(tt, http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		io.Copy(rw, req.Body)
+	}))
+	defer close()
+
+	t := New(tt, "http://"+addr)
+
+	resp := t.Request(GET, func(req *http.Request) {
+		req.Body = ioutil.NopCloser(strings.NewReader("howdy"))
+	})
+
+	t.Run("DuplicateBody", func(t T) {
 		for i := 0; i < 4; i++ {
-			assert.Equal(t, "howdy", string(resp.DuplicateBody()))
+			assert.Equal(t, "howdy", string(DuplicateBody(t, resp)))
+		}
+	})
+
+	t.Run("But", func(t T) {
+		for i := 0; i < 3; i++ {
+			t.Logf("Iteration %v", i)
+			resp.But(
+				t,
+				func(req *http.Request) {
+					// Ensure request is being copied for every But.
+					req.URL.Path += "/a"
+					require.Equal(t, "/a", req.URL.Path)
+					req.Body = ioutil.NopCloser(strings.NewReader("a"))
+				},
+			).Assert(
+				func(resp Response) {
+					assert.Equal(t, []byte("a"), DuplicateBody(t, resp))
+				},
+			)
 		}
 	})
 }

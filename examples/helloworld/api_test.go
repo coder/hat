@@ -1,9 +1,11 @@
 package helloworld
 
 import (
+	"net/http"
 	"testing"
 
 	"github.com/codercom/hat"
+	"github.com/codercom/hat/hatassert"
 	"github.com/stretchr/testify/assert"
 	"go.coder.com/ctest/chttptest"
 )
@@ -14,15 +16,28 @@ func TestAPI(tt *testing.T) {
 
 	t := hat.New(tt, "http://"+addr)
 
-	t.Run("Hello Echo", func(t hat.T) {
-		t.Request(hat.GET).Assert(func(r hat.Response) {
-			byt := r.DuplicateBody()
-			assert.Equal(t, "Hello /", string(byt))
-		})
+	t.Run("Hello Echo single-parent chain", func(t hat.T) {
+		req := t.Get()
 
-		t.RequestURL(hat.GET, "/dog_soup").Assert(func(r hat.Response) {
-			byt := r.DuplicateBody()
-			assert.Equal(t, "Hello /dog_soup", string(byt))
+		req.Send(t).Assert(
+			t,
+			func(t hat.T, r hat.Response) {
+				byt := t.DuplicateBody(r)
+				assert.Equal(t, "Hello /", string(byt))
+			},
+		)
+
+		t.Run("underscore", func(t hat.T) {
+			req.Clone(t,
+				hat.Path("/1234567890"),
+			).Send(t).Assert(
+				t,
+				func(t hat.T, r hat.Response) {
+					byt := t.DuplicateBody(r)
+					assert.Equal(t, "Path too long\n", string(byt))
+				},
+				hatassert.StatusEqual(t, http.StatusBadRequest),
+			)
 		})
 	})
 }

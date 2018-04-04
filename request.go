@@ -5,17 +5,25 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/stretchr/testify/require"
 )
 
 // RequestOption modifies a request.
-type RequestOption func(req *http.Request)
+type RequestOption func(t T, req *http.Request)
 
 // URLParams sets the URL parameters of the request.
 func URLParams(v url.Values) RequestOption {
-	return func(req *http.Request) {
+	return func(_ T, req *http.Request) {
 		req.URL.RawQuery += v.Encode()
+	}
+}
+
+// Path appends path to the URL.
+func Path(path string) RequestOption {
+	return func(_ T, req *http.Request) {
+		req.URL.Path += path
 	}
 }
 
@@ -26,34 +34,97 @@ func Body(r io.Reader) RequestOption {
 		rdc = ioutil.NopCloser(r)
 	}
 
-	return func(req *http.Request) {
+	return func(_ T, req *http.Request) {
 		req.Body = rdc
 	}
 }
 
-// Request sends an HTTP request to the endpoint.
-// body may be nil.
-func (t T) Request(method Method, opts ...RequestOption) *Response {
-	req, err := http.NewRequest(string(method), t.URL, nil)
-	require.NoError(t, err, "failed to create request")
-
-	for _, opt := range opts {
-		opt(req)
-	}
-
+func (t T) sendRequest(req *http.Request) Response {
 	t.Logf("%v %v", req.Method, req.URL)
 	resp, err := t.Client.Do(req)
 	require.NoError(t, err, "failed to send request")
 
-	return &Response{
+	return Response{
 		Response: resp,
 	}
 }
 
-// RequestURL sends a request with endpoint appended to the internal URL.
-func (t T) RequestURL(method Method, endpoint string, opts ...RequestOption) *Response {
-	opts = append(opts, func(r *http.Request) {
-		r.URL.Path = urlJoin(r.URL.Path, endpoint)
+// Request represents a pending HTTP request.
+type Request struct {
+	*http.Request
+
+	// copy creates an exact copy of the request.
+	copy func() *http.Request
+}
+
+func makeRequest(copy func() *http.Request) Request {
+	req := Request{
+		copy: copy,
+	}
+	req.Request = req.copy()
+	return req
+}
+
+// Send dispatches the HTTP request.
+func (r Request) Send(t T) Response {
+	t.Logf("%v %v", r.Method, r.URL)
+	resp, err := t.Client.Do(r.Request)
+	require.NoError(t, err, "failed to send request")
+
+	return Response{
+		Response: resp,
+	}
+}
+
+// Clone creates a duplicate HTTP request and applies opts to it.
+func (r Request) Clone(t T, opts ...RequestOption) Request {
+	return makeRequest(func() *http.Request {
+		req := r.copy()
+		for _, opt := range opts {
+			opt(t, req)
+		}
+		return req
 	})
-	return t.Request(method, opts...)
+}
+
+// Request creates an HTTP request to the endpoint.
+func (t T) Request(method string, opts ...RequestOption) Request {
+	return makeRequest(
+		func() *http.Request {
+			method = strings.ToUpper(method)
+
+			req, err := http.NewRequest(string(method), t.URL, nil)
+			require.NoError(t, err, "failed to create request")
+
+			for _, opt := range opts {
+				opt(t, req)
+			}
+
+			return req
+		},
+	)
+}
+
+func (t T) Get(opts ...RequestOption) Request {
+	return t.Request("Get", opts...)
+}
+
+func (t T) Head(opts ...RequestOption) Request {
+	return t.Request("Head", opts...)
+}
+
+func (t T) Post(opts ...RequestOption) Request {
+	return t.Request("Post", opts...)
+}
+
+func (t T) Put(opts ...RequestOption) Request {
+	return t.Request("Put", opts...)
+}
+
+func (t T) Patch(opts ...RequestOption) Request {
+	return t.Request("Patch", opts...)
+}
+
+func (t T) Delete(opts ...RequestOption) Request {
+	return t.Request("Delete", opts...)
 }

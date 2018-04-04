@@ -23,7 +23,7 @@ func TestT(tt *testing.T) {
 	})
 
 	t.Run("RunURL Creates deep copy, and appends to URL", func(t T) {
-		t.RunURL("/deeper", func(dt T) {
+		t.RunPath("/deeper", func(dt T) {
 			assert.Equal(t, "http://"+addr+"/deeper", dt.URL)
 			assert.NotEqual(t, dt.URL, t.URL)
 		})

@@ -36,7 +36,7 @@ func TestAPI(tt *testing.T) {
 					byt := t.DuplicateBody(r)
 					assert.Equal(t, "Path too long\n", string(byt))
 				},
-				hatassert.StatusEqual(t, http.StatusBadRequest),
+				hatassert.StatusEqual(http.StatusBadRequest),
 			)
 		})
 	})

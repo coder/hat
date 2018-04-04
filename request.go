@@ -51,7 +51,7 @@ func (t T) sendRequest(req *http.Request) Response {
 
 // Request represents a pending HTTP request.
 type Request struct {
-	*http.Request
+	r *http.Request
 
 	// copy creates an exact copy of the request.
 	copy func() *http.Request
@@ -61,14 +61,14 @@ func makeRequest(copy func() *http.Request) Request {
 	req := Request{
 		copy: copy,
 	}
-	req.Request = req.copy()
+	req.r = req.copy()
 	return req
 }
 
 // Send dispatches the HTTP request.
 func (r Request) Send(t T) Response {
-	t.Logf("%v %v", r.Method, r.URL)
-	resp, err := t.Client.Do(r.Request)
+	t.Logf("%v %v", r.r.Method, r.r.URL)
+	resp, err := t.Client.Do(r.r)
 	require.NoError(t, err, "failed to send request")
 
 	return Response{

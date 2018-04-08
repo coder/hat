@@ -14,9 +14,9 @@ func TestAPI(tt *testing.T) {
 	addr, close := chttptest.StartHTTPServer(tt, &API{})
 	defer close()
 
-	t := hat.Make(tt, addr)
+	t := hat.New(tt, addr)
 
-	t.Run("Hello Echo single-parent chain", func(t hat.T) {
+	t.Run("Hello Echo single-parent chain", func(t *hat.T) {
 		req := t.Get()
 
 		req.Send(t).Assert(
@@ -27,7 +27,7 @@ func TestAPI(tt *testing.T) {
 			},
 		)
 
-		t.Run("underscore", func(t hat.T) {
+		t.Run("underscore", func(t *hat.T) {
 			req.Clone(
 				hat.Path("/1234567890"),
 			).Send(t).Assert(

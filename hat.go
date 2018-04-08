@@ -20,13 +20,13 @@ type T struct {
 	Client *http.Client
 }
 
-// Make creates a T from a testing.T.
-func Make(t *testing.T, addr string) T {
+// New creates a *T from a *testing.T.
+func New(t *testing.T, addr string) *T {
 	client := &http.Client{
 		Timeout: time.Second * 5,
 	}
 
-	return T{
+	return &T{
 		T: t,
 		URL: &url.URL{
 			Scheme: "http",
@@ -38,20 +38,21 @@ func Make(t *testing.T, addr string) T {
 
 // Run creates a subtest.
 // The subtest inherits the settings of T.
-func (t T) Run(name string, fn func(t T)) {
+func (t *T) Run(name string, fn func(t *T)) {
 	t.T.Run(name, func(tt *testing.T) {
+		t := *t
 		t.T = tt
 		u := *t.URL
 		t.URL = &u
 
-		fn(t)
+		fn(&t)
 	})
 }
 
 // RunPath creates a subtest with segment appended to the internal URL.
 // It uses segment as the name of the subtest.
-func (t T) RunPath(elem string, fn func(t T)) {
-	t.Run(elem, func(t T) {
+func (t *T) RunPath(elem string, fn func(t *T)) {
+	t.Run(elem, func(t *T) {
 		t.URL.Path = path.Join(t.URL.Path, elem)
 
 		fn(t)

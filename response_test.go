@@ -33,19 +33,19 @@ func TestResponse(tt *testing.T) {
 	}))
 	defer close()
 
-	t := Make(tt, addr)
+	t := New(tt, addr)
 
 	req := t.Get(func(req *http.Request) {
 		req.Body = ioutil.NopCloser(strings.NewReader("howdy"))
 	})
 
-	t.Run("DuplicateBody", func(t T) {
+	t.Run("DuplicateBody", func(t *T) {
 		for i := 0; i < 4; i++ {
 			assert.Equal(t, "howdy", string(req.Clone().Send(t).DuplicateBody(t)))
 		}
 	})
 
-	t.Run("Again", func(t T) {
+	t.Run("Again", func(t *T) {
 		for i := 0; i < 3; i++ {
 			t.Logf("Iteration %v", i)
 			req.Clone(

@@ -55,7 +55,7 @@ func makeRequest(copy func() *http.Request) Request {
 }
 
 // Send dispatches the HTTP request.
-func (r Request) Send(t T) *Response {
+func (r Request) Send(t *T) *Response {
 	t.Logf("%v %v", r.r.Method, r.r.URL)
 
 	resp, err := t.Client.Do(r.r)
@@ -93,26 +93,26 @@ func (t T) Request(method string, opts ...RequestOption) Request {
 	)
 }
 
-func (t T) Get(opts ...RequestOption) Request {
+func (t *T) Get(opts ...RequestOption) Request {
 	return t.Request(http.MethodGet, opts...)
 }
 
-func (t T) Head(opts ...RequestOption) Request {
+func (t *T) Head(opts ...RequestOption) Request {
 	return t.Request(http.MethodHead, opts...)
 }
 
-func (t T) Post(opts ...RequestOption) Request {
+func (t *T) Post(opts ...RequestOption) Request {
 	return t.Request(http.MethodPost, opts...)
 }
 
-func (t T) Put(opts ...RequestOption) Request {
+func (t *T) Put(opts ...RequestOption) Request {
 	return t.Request(http.MethodPut, opts...)
 }
 
-func (t T) Patch(opts ...RequestOption) Request {
+func (t *T) Patch(opts ...RequestOption) Request {
 	return t.Request(http.MethodPatch, opts...)
 }
 
-func (t T) Delete(opts ...RequestOption) Request {
+func (t *T) Delete(opts ...RequestOption) Request {
 	return t.Request(http.MethodDelete, opts...)
 }

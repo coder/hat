@@ -12,9 +12,10 @@ import (
 func TestURLParams(t *testing.T) {
 	req, err := http.NewRequest("GET", "http://google.com", nil)
 	require.NoError(t, err)
+
 	URLParams(url.Values{
 		"q": []string{"sean"},
-	})(T{}, req)
+	})(req)
 
 	assert.Equal(t, "http://google.com?q=sean", req.URL.String())
 }

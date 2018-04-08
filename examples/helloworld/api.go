@@ -8,12 +8,12 @@ import (
 type API struct {
 }
 
-func (a *API) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
-	if len(req.URL.Path) > 9 {
-		http.Error(rw, "Path too long", http.StatusBadRequest)
+func (a *API) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if len(r.URL.Path) > 9 {
+		http.Error(w, "Path too long", http.StatusBadRequest)
 		return
 	}
 
-	rw.WriteHeader(http.StatusOK)
-	fmt.Fprintf(rw, "Hello "+req.URL.Path)
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, "Hello "+r.URL.Path)
 }

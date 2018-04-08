@@ -41,9 +41,8 @@ func Make(t *testing.T, addr string) T {
 func (t T) Run(name string, fn func(t T)) {
 	t.T.Run(name, func(tt *testing.T) {
 		t.T = tt
-		u := t.URL
-		t.URL = &url.URL{}
-		*t.URL = *u
+		u := *t.URL
+		t.URL = &u
 
 		fn(t)
 	})

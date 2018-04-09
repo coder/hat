@@ -11,18 +11,19 @@ import (
 )
 
 // RequestOption modifies a request.
+// Use the passed t to fail if the option cannot be set.
 type RequestOption func(t testing.TB, req *http.Request)
 
 // URLParams sets the URL parameters of the request.
 func URLParams(v url.Values) RequestOption {
-	return func(t testing.TB, req *http.Request) {
+	return func(_ testing.TB, req *http.Request) {
 		req.URL.RawQuery += v.Encode()
 	}
 }
 
 // Path appends path to the URL.
 func Path(path string) RequestOption {
-	return func(t testing.TB, req *http.Request) {
+	return func(_ testing.TB, req *http.Request) {
 		req.URL.Path += path
 	}
 }
@@ -34,7 +35,7 @@ func Body(r io.Reader) RequestOption {
 		rc = ioutil.NopCloser(r)
 	}
 
-	return func(t testing.TB, req *http.Request) {
+	return func(_ testing.TB, req *http.Request) {
 		req.Body = rc
 	}
 }

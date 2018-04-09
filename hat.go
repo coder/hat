@@ -6,6 +6,8 @@ import (
 	"path"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/require"
 )
 
 // T represents a test instance.
@@ -26,12 +28,12 @@ func New(t *testing.T, addr string) *T {
 		Timeout: time.Second * 5,
 	}
 
+	u, err := url.Parse(addr)
+	require.NoError(t, err)
+
 	return &T{
-		T: t,
-		URL: &url.URL{
-			Scheme: "http",
-			Host:   addr,
-		},
+		T:      t,
+		URL:    u,
 		Client: client,
 	}
 }

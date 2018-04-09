@@ -1,65 +1,60 @@
 package hat
 
 import (
-	"bytes"
-	"io/ioutil"
 	"net/http"
+	"net/url"
+	"path"
 	"testing"
 	"time"
 )
 
 // T represents a test instance.
-// It intentionally does not provide any default assertions or
-// default response modifiers.
-// Defaults should be explicitely provided to
+// It intentionally does not provide any default request modifiers or
+// default response assertions.
+// Defaults should be explicitly provided to
 // Request and Assert.
 type T struct {
 	*testing.T
-	URL string
 
+	URL    *url.URL
 	Client *http.Client
 }
 
-// New creates a T from a testing.T.
-func New(t *testing.T, URL string) *T {
+// New creates a *T from a *testing.T.
+func New(t *testing.T, addr string) *T {
 	client := &http.Client{
 		Timeout: time.Second * 5,
 	}
+
 	return &T{
-		T:      t,
-		URL:    URL,
+		T: t,
+		URL: &url.URL{
+			Scheme: "http",
+			Host:   addr,
+		},
 		Client: client,
 	}
 }
 
-// DuplicateBody reads in the response body.
-// It replaces the underlying body with a duplicate.
-func (t T) DuplicateBody(r Response) []byte {
-	byt, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		t.Fatalf("failed to read body: %v", err)
-	}
-
-	r.Response.Body = ioutil.NopCloser(bytes.NewReader(byt))
-
-	return byt
-}
-
 // Run creates a subtest.
 // The subtest inherits the settings of T.
-func (t T) Run(name string, fn func(t T)) {
+func (t *T) Run(name string, fn func(t *T)) {
 	t.T.Run(name, func(tt *testing.T) {
+		t := *t
 		t.T = tt
+		u := *t.URL
+		t.URL = &u
 
-		fn(t)
+		fn(&t)
 	})
 }
 
 // RunPath creates a subtest with segment appended to the internal URL.
 // It uses segment as the name of the subtest.
-func (t T) RunPath(path string, fn func(t T)) {
-	t.Run(path, func(t T) {
-		t.URL = urlJoin(t.URL, path)
+func (t *T) RunPath(elem string, fn func(t *T)) {
+	t.Run(elem, func(t *T) {
+		t.URL.Path = path.Join(t.URL.Path, elem)
+
 		fn(t)
 	})
 }

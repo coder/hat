@@ -5,47 +5,38 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"strings"
+	"testing"
 
 	"github.com/stretchr/testify/require"
 )
 
 // RequestOption modifies a request.
-type RequestOption func(t T, req *http.Request)
+// Use the passed t to fail if the option cannot be set.
+type RequestOption func(t testing.TB, req *http.Request)
 
 // URLParams sets the URL parameters of the request.
 func URLParams(v url.Values) RequestOption {
-	return func(_ T, req *http.Request) {
+	return func(_ testing.TB, req *http.Request) {
 		req.URL.RawQuery += v.Encode()
 	}
 }
 
 // Path appends path to the URL.
 func Path(path string) RequestOption {
-	return func(_ T, req *http.Request) {
+	return func(_ testing.TB, req *http.Request) {
 		req.URL.Path += path
 	}
 }
 
 // Body sets the body of a request.
 func Body(r io.Reader) RequestOption {
-	rdc, ok := r.(io.ReadCloser)
+	rc, ok := r.(io.ReadCloser)
 	if !ok {
-		rdc = ioutil.NopCloser(r)
+		rc = ioutil.NopCloser(r)
 	}
 
-	return func(_ T, req *http.Request) {
-		req.Body = rdc
-	}
-}
-
-func (t T) sendRequest(req *http.Request) Response {
-	t.Logf("%v %v", req.Method, req.URL)
-	resp, err := t.Client.Do(req)
-	require.NoError(t, err, "failed to send request")
-
-	return Response{
-		Response: resp,
+	return func(_ testing.TB, req *http.Request) {
+		req.Body = rc
 	}
 }
 
@@ -59,25 +50,26 @@ type Request struct {
 
 func makeRequest(copy func() *http.Request) Request {
 	req := Request{
+		r:    copy(),
 		copy: copy,
 	}
-	req.r = req.copy()
 	return req
 }
 
 // Send dispatches the HTTP request.
-func (r Request) Send(t T) Response {
+func (r Request) Send(t *T) *Response {
 	t.Logf("%v %v", r.r.Method, r.r.URL)
+
 	resp, err := t.Client.Do(r.r)
 	require.NoError(t, err, "failed to send request")
 
-	return Response{
+	return &Response{
 		Response: resp,
 	}
 }
 
 // Clone creates a duplicate HTTP request and applies opts to it.
-func (r Request) Clone(t T, opts ...RequestOption) Request {
+func (r Request) Clone(t testing.TB, opts ...RequestOption) Request {
 	return makeRequest(func() *http.Request {
 		req := r.copy()
 		for _, opt := range opts {
@@ -91,9 +83,7 @@ func (r Request) Clone(t T, opts ...RequestOption) Request {
 func (t T) Request(method string, opts ...RequestOption) Request {
 	return makeRequest(
 		func() *http.Request {
-			method = strings.ToUpper(method)
-
-			req, err := http.NewRequest(string(method), t.URL, nil)
+			req, err := http.NewRequest(method, t.URL.String(), nil)
 			require.NoError(t, err, "failed to create request")
 
 			for _, opt := range opts {
@@ -105,26 +95,26 @@ func (t T) Request(method string, opts ...RequestOption) Request {
 	)
 }
 
-func (t T) Get(opts ...RequestOption) Request {
-	return t.Request("Get", opts...)
+func (t *T) Get(opts ...RequestOption) Request {
+	return t.Request(http.MethodGet, opts...)
 }
 
-func (t T) Head(opts ...RequestOption) Request {
-	return t.Request("Head", opts...)
+func (t *T) Head(opts ...RequestOption) Request {
+	return t.Request(http.MethodHead, opts...)
 }
 
-func (t T) Post(opts ...RequestOption) Request {
-	return t.Request("Post", opts...)
+func (t *T) Post(opts ...RequestOption) Request {
+	return t.Request(http.MethodPost, opts...)
 }
 
-func (t T) Put(opts ...RequestOption) Request {
-	return t.Request("Put", opts...)
+func (t *T) Put(opts ...RequestOption) Request {
+	return t.Request(http.MethodPut, opts...)
 }
 
-func (t T) Patch(opts ...RequestOption) Request {
-	return t.Request("Patch", opts...)
+func (t *T) Patch(opts ...RequestOption) Request {
+	return t.Request(http.MethodPatch, opts...)
 }
 
-func (t T) Delete(opts ...RequestOption) Request {
-	return t.Request("Delete", opts...)
+func (t *T) Delete(opts ...RequestOption) Request {
+	return t.Request(http.MethodDelete, opts...)
 }

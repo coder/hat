@@ -1,17 +1,20 @@
 package hat
 
 import (
+	"bytes"
+	"io/ioutil"
 	"net/http"
+	"testing"
 )
 
 // ResponseAssertion asserts a quality of the response.
-type ResponseAssertion func(t T, r Response)
+type ResponseAssertion func(t testing.TB, r Response)
 
 // CombineResponseAssertions returns a new ResponseAssertion which internally
 // calls each member of asserts in the provided order.
-func CombineResponseAssertions(asserts ...ResponseAssertion) ResponseAssertion {
-	return func(t T, r Response) {
-		for _, a := range asserts {
+func CombineResponseAssertions(as ...ResponseAssertion) ResponseAssertion {
+	return func(t testing.TB, r Response) {
+		for _, a := range as {
 			a(t, r)
 		}
 	}
@@ -24,10 +27,29 @@ type Response struct {
 
 // Assert runs each assertion against the response.
 // It closes the response body after all of the assertions have ran.
-func (r Response) Assert(t T, assertions ...ResponseAssertion) Response {
+// Assert must be called for every response as it will ensure the body is closed.
+// If you want to continue to reuse the connection, you must read the response body.
+func (r Response) Assert(t testing.TB, assertions ...ResponseAssertion) Response {
 	defer r.Body.Close()
+
 	for _, a := range assertions {
 		a(t, r)
 	}
+
 	return r
+}
+
+// DuplicateBody reads in the response body.
+// It replaces the underlying body with a duplicate.
+func (r Response) DuplicateBody(t testing.TB) []byte {
+	defer r.Body.Close()
+
+	byt, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		t.Fatalf("failed to read body: %v", err)
+	}
+
+	r.Response.Body = ioutil.NopCloser(bytes.NewReader(byt))
+
+	return byt
 }

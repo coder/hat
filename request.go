@@ -5,23 +5,24 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"testing"
 
 	"github.com/stretchr/testify/require"
 )
 
 // RequestOption modifies a request.
-type RequestOption func(req *http.Request)
+type RequestOption func(t testing.TB, req *http.Request)
 
 // URLParams sets the URL parameters of the request.
 func URLParams(v url.Values) RequestOption {
-	return func(req *http.Request) {
+	return func(t testing.TB, req *http.Request) {
 		req.URL.RawQuery += v.Encode()
 	}
 }
 
 // Path appends path to the URL.
 func Path(path string) RequestOption {
-	return func(req *http.Request) {
+	return func(t testing.TB, req *http.Request) {
 		req.URL.Path += path
 	}
 }
@@ -33,7 +34,7 @@ func Body(r io.Reader) RequestOption {
 		rc = ioutil.NopCloser(r)
 	}
 
-	return func(req *http.Request) {
+	return func(t testing.TB, req *http.Request) {
 		req.Body = rc
 	}
 }
@@ -67,11 +68,11 @@ func (r Request) Send(t *T) *Response {
 }
 
 // Clone creates a duplicate HTTP request and applies opts to it.
-func (r Request) Clone(opts ...RequestOption) Request {
+func (r Request) Clone(t testing.TB, opts ...RequestOption) Request {
 	return makeRequest(func() *http.Request {
 		req := r.copy()
 		for _, opt := range opts {
-			opt(req)
+			opt(t, req)
 		}
 		return req
 	})
@@ -85,7 +86,7 @@ func (t T) Request(method string, opts ...RequestOption) Request {
 			require.NoError(t, err, "failed to create request")
 
 			for _, opt := range opts {
-				opt(req)
+				opt(t, req)
 			}
 
 			return req

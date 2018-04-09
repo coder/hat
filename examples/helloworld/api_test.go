@@ -28,7 +28,7 @@ func TestAPI(tt *testing.T) {
 		)
 
 		t.Run("underscore", func(t *hat.T) {
-			req.Clone(
+			req.Clone(t,
 				hat.Path("/1234567890"),
 			).Send(t).Assert(
 				t,

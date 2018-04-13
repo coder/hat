@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"strings"
 	"testing"
 	"time"
 
@@ -56,6 +57,9 @@ func (t *T) Run(name string, fn func(t *T)) {
 func (t *T) RunPath(elem string, fn func(t *T)) {
 	t.Run(elem, func(t *T) {
 		t.URL.Path = path.Join(t.URL.Path, elem)
+		if strings.HasSuffix(elem, "/") {
+			t.URL.Path += "/"
+		}
 
 		fn(t)
 	})

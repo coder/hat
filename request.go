@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"path"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -21,10 +22,14 @@ func URLParams(v url.Values) RequestOption {
 	}
 }
 
-// Path appends path to the URL.
-func Path(path string) RequestOption {
+// Path joins elem on to the URL.
+func Path(elem string) RequestOption {
 	return func(_ testing.TB, req *http.Request) {
-		req.URL.Path += path
+		req.URL.Path = path.Join(req.URL.Path, elem)
+		// preserve trailing slash
+		if elem[len(elem)-1] == '/' && req.URL.Path != "/" {
+			req.URL.Path += "/"
+		}
 	}
 }
 
@@ -37,6 +42,16 @@ func Body(r io.Reader) RequestOption {
 
 	return func(_ testing.TB, req *http.Request) {
 		req.Body = rc
+	}
+}
+
+// CombineRequestOptions returns a new RequestOption which internally
+// calls each member of options in the provided order.
+func CombineRequestOptions(opts ...RequestOption) RequestOption {
+	return func(t testing.TB, req *http.Request) {
+		for _, o := range opts {
+			o(t, req)
+		}
 	}
 }
 

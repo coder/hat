@@ -56,6 +56,7 @@ func (t *T) Run(name string, fn func(t *T)) {
 func (t *T) RunPath(elem string, fn func(t *T)) {
 	t.Run(elem, func(t *T) {
 		t.URL.Path = path.Join(t.URL.Path, elem)
+		// preserve trailing slash
 		if elem[len(elem)-1] == '/' && t.URL.Path != "/" {
 			t.URL.Path += "/"
 		}

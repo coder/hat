@@ -26,6 +26,10 @@ func URLParams(v url.Values) RequestOption {
 func Path(elem string) RequestOption {
 	return func(_ testing.TB, req *http.Request) {
 		req.URL.Path = path.Join(req.URL.Path, elem)
+		// preserve trailing slash
+		if elem[len(elem)-1] == '/' && req.URL.Path != "/" {
+			req.URL.Path += "/"
+		}
 	}
 }
 

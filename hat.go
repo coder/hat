@@ -64,3 +64,57 @@ func (t *T) RunPath(elem string, fn func(t *T)) {
 		fn(t)
 	})
 }
+
+// Tests represents a group of independent tests.
+//
+// Nested Tests can be constructed by lifting the
+// sub-group with Tests.RunNamed or Tests.RunPaths.
+//
+//     var myT *T
+//
+//     Tests{
+//         "simple test": func(*T) {},
+//
+//         "some property holds": Tests{
+//             "case 1": func(*T) {},
+//             "case 2": func(*T) {},
+//         }.RunNamed, // lifts the nested Tests
+//     }.RunNamed(myT) // recurse & execute all tests
+type Tests map[string]func(*T)
+
+var exampleNestedTest func(*T) = Tests{
+	"simple test": func(*T) {},
+
+	"some property holds": Tests{
+		"case 1": func(*T) {},
+		"case 2": func(*T) {},
+	}.RunNamed,
+
+	"some section": Tests{
+		"/hello/world": func(*T) {},
+
+		"/foo/bar": Tests{
+			"/baz":  func(*T) {},
+			"/qux":  func(*T) {},
+			"/thud": func(*T) {},
+		}.RunPaths,
+	}.RunPaths,
+}.RunNamed
+
+// RunNamed runs the Tests using (*T).Run.
+//
+// The order of execution is undefined.
+func (ts Tests) RunNamed(t *T) {
+	for name, test := range ts {
+		t.Run(name, test)
+	}
+}
+
+// RunPaths runs the Tests using (*T).RunPath.
+//
+// The order of execution is undefined.
+func (ts Tests) RunPaths(t *T) {
+	for path, test := range ts {
+		t.RunPath(path, test)
+	}
+}

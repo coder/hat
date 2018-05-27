@@ -82,7 +82,7 @@ func (t *T) RunPath(elem string, fn func(t *T)) {
 //     }.RunNamed(myT) // recurse & execute all tests
 type Tests map[string]func(*T)
 
-var exampleNestedTest func(*T) = Tests{
+var _ func(*T) = Tests{
 	"simple test": func(*T) {},
 
 	"some property holds": Tests{

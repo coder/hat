@@ -13,6 +13,7 @@ import (
 // BodyEqual checks if the response body equals expects.
 func BodyEqual(expects []byte) hat.ResponseAssertion {
 	return func(t testing.TB, r hat.Response) {
+		t.Helper()
 		assert.Equal(t, expects, r.DuplicateBody(t))
 	}
 }
@@ -23,6 +24,7 @@ func BodyMatches(expr string) hat.ResponseAssertion {
 	rg, err := regexp.Compile(expr)
 
 	return func(t testing.TB, r hat.Response) {
+		t.Helper()
 		require.NoError(t, err, "failed to compile regex")
 
 		byt := r.DuplicateBody(t)

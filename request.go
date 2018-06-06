@@ -49,6 +49,7 @@ func Body(r io.Reader) RequestOption {
 // calls each member of options in the provided order.
 func CombineRequestOptions(opts ...RequestOption) RequestOption {
 	return func(t testing.TB, req *http.Request) {
+		t.Helper()
 		for _, o := range opts {
 			o(t, req)
 		}
@@ -63,7 +64,8 @@ type Request struct {
 	copy func() *http.Request
 }
 
-func makeRequest(copy func() *http.Request) Request {
+func makeRequest(t testing.TB, copy func() *http.Request) Request {
+	t.Helper()
 	req := Request{
 		r:    copy(),
 		copy: copy,
@@ -73,6 +75,7 @@ func makeRequest(copy func() *http.Request) Request {
 
 // Send dispatches the HTTP request.
 func (r Request) Send(t *T) *Response {
+	t.Helper()
 	t.Logf("%v %v", r.r.Method, r.r.URL)
 
 	resp, err := t.Client.Do(r.r)
@@ -85,7 +88,9 @@ func (r Request) Send(t *T) *Response {
 
 // Clone creates a duplicate HTTP request and applies opts to it.
 func (r Request) Clone(t testing.TB, opts ...RequestOption) Request {
-	return makeRequest(func() *http.Request {
+	t.Helper()
+	return makeRequest(t, func() *http.Request {
+		t.Helper()
 		req := r.copy()
 		for _, opt := range opts {
 			opt(t, req)
@@ -96,7 +101,7 @@ func (r Request) Clone(t testing.TB, opts ...RequestOption) Request {
 
 // Request creates an HTTP request to the endpoint.
 func (t T) Request(method string, opts ...RequestOption) Request {
-	return makeRequest(
+	return makeRequest(t.T,
 		func() *http.Request {
 			req, err := http.NewRequest(method, t.URL.String(), nil)
 			require.NoError(t, err, "failed to create request")

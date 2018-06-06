@@ -9,6 +9,7 @@ import (
 
 func HeaderEqual(header, expected string) hat.ResponseAssertion {
 	return func(t testing.TB, r hat.Response) {
+		t.Helper()
 		assert.Equal(t, expected, r.Header.Get(header))
 	}
 }

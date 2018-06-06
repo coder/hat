@@ -14,6 +14,7 @@ type ResponseAssertion func(t testing.TB, r Response)
 // calls each member of asserts in the provided order.
 func CombineResponseAssertions(as ...ResponseAssertion) ResponseAssertion {
 	return func(t testing.TB, r Response) {
+		t.Helper()
 		for _, a := range as {
 			a(t, r)
 		}
@@ -30,6 +31,7 @@ type Response struct {
 // Assert must be called for every response as it will ensure the body is closed.
 // If you want to continue to reuse the connection, you must read the response body.
 func (r Response) Assert(t testing.TB, assertions ...ResponseAssertion) Response {
+	t.Helper()
 	defer r.Body.Close()
 
 	for _, a := range assertions {

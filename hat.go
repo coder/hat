@@ -42,6 +42,7 @@ func New(t *testing.T, addr string) *T {
 // The subtest inherits the settings of T.
 func (t *T) Run(name string, fn func(t *T)) {
 	t.T.Run(name, func(tt *testing.T) {
+		tt.Helper()
 		t := *t
 		t.T = tt
 		u := *t.URL

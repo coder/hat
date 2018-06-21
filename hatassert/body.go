@@ -11,10 +11,20 @@ import (
 )
 
 // BodyEqual checks if the response body equals expects.
+// Use BodyStringEqual instead of casting `expects` from a string so
+// the error message shows the textual difference.
 func BodyEqual(expects []byte) hat.ResponseAssertion {
 	return func(t testing.TB, r hat.Response) {
 		t.Helper()
 		assert.Equal(t, expects, r.DuplicateBody(t))
+	}
+}
+
+// BodyStringEqual checks if the body equals string expects.
+func BodyStringEqual(expects string) hat.ResponseAssertion {
+	return func(t testing.TB, r hat.Response) {
+		t.Helper()
+		assert.Equal(t, expects, string(r.DuplicateBody(t)))
 	}
 }
 

@@ -3,7 +3,7 @@ package hatassert
 import (
 	"testing"
 
-	"github.com/codercom/hat"
+	"go.coder.com/hat"
 	"github.com/stretchr/testify/assert"
 )
 

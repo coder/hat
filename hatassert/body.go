@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/codercom/hat"
+	"go.coder.com/hat"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/codercom/hat"
-	"github.com/codercom/hat/hatassert"
+	"go.coder.com/hat"
+	"go.coder.com/hat/hatassert"
 	"github.com/stretchr/testify/assert"
 	"go.coder.com/ctest/chttptest"
 )

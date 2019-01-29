@@ -15,7 +15,7 @@ func TestT(tt *testing.T) {
 	}))
 	defer close()
 
-	t := New(tt, addr)
+	t := New(tt, "http://"  + addr)
 
 	t.Run("Run Creates deep copy", func(dt *T) {
 		dt.URL.Path = "testing"

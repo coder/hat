@@ -23,12 +23,12 @@ type T struct {
 }
 
 // New creates a *T from a *testing.T.
-func New(t *testing.T, addr string) *T {
+func New(t *testing.T, baseURL string) *T {
 	client := &http.Client{
 		Timeout: time.Second * 5,
 	}
 
-	u, err := url.Parse(addr)
+	u, err := url.Parse(baseURL)
 	require.NoError(t, err)
 
 	return &T{

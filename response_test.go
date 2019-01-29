@@ -33,7 +33,7 @@ func TestResponse(tt *testing.T) {
 	}))
 	defer close()
 
-	t := New(tt, addr)
+	t := New(tt, "http://" + addr)
 
 	req := t.Get(func(t testing.TB, req *http.Request) {
 		req.Body = ioutil.NopCloser(strings.NewReader("howdy"))

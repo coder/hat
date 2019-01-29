@@ -14,7 +14,7 @@ func TestAPI(tt *testing.T) {
 	addr, close := chttptest.StartHTTPServer(tt, &API{})
 	defer close()
 
-	t := hat.New(tt, addr)
+	t := hat.New(tt, "http://" + addr)
 
 	t.Run("Hello Echo single-parent chain", func(t *hat.T) {
 		req := t.Get()

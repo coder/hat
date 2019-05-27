@@ -4,12 +4,11 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/http/httptest"
 	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
-
-	"go.coder.com/m/lib/ctest/chttptest"
 )
 
 func TestBody(t *testing.T) {
@@ -27,12 +26,12 @@ func TestBody(t *testing.T) {
 func TestResponse(tt *testing.T) {
 	tt.Parallel()
 
-	addr, close := chttptest.StartHTTPServer(tt, http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+	s := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		io.Copy(rw, req.Body)
 	}))
-	defer close()
+	defer s.Close()
 
-	t := New(tt, "http://"+addr)
+	t := New(tt, s.URL)
 
 	req := t.Get(func(t testing.TB, req *http.Request) {
 		req.Body = ioutil.NopCloser(strings.NewReader("howdy"))

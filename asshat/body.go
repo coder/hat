@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"go.coder.com/m/lib/hat"
+	"go.coder.com/hat"
 )
 
 // BodyEqual checks if the response body equals expects.

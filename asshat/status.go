@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"go.coder.com/m/lib/hat"
+	"go.coder.com/hat"
 )
 
 // StatusEqual ensures the response status equals expected.

@@ -2,20 +2,20 @@ package helloworld
 
 import (
 	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
-	"go.coder.com/m/lib/ctest/chttptest"
-	"go.coder.com/m/lib/hat"
-	"go.coder.com/m/lib/hat/asshat"
+	"go.coder.com/hat"
+	"go.coder.com/hat/asshat"
 )
 
 func TestAPI(tt *testing.T) {
-	addr, close := chttptest.StartHTTPServer(tt, &API{})
-	defer close()
+	s := httptest.NewServer(&API{})
+	defer s.Close()
 
-	t := hat.New(tt, "http://"+addr)
+	t := hat.New(tt, s.URL)
 
 	t.Run("Hello Echo single-parent chain", func(t *hat.T) {
 		req := t.Get()

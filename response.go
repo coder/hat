@@ -7,11 +7,11 @@ import (
 	"testing"
 )
 
-// ResponseAssertion asserts a quality of the response.
+// ResponseAssertion requires a quality of the response.
 type ResponseAssertion func(t testing.TB, r Response)
 
 // CombineResponseAssertions returns a new ResponseAssertion which internally
-// calls each member of asserts in the provided order.
+// calls each member of requires in the provided order.
 func CombineResponseAssertions(as ...ResponseAssertion) ResponseAssertion {
 	return func(t testing.TB, r Response) {
 		t.Helper()
@@ -26,8 +26,8 @@ type Response struct {
 	*http.Response
 }
 
-// Assert runs each assertion against the response.
-// It closes the response body after all of the assertions have ran.
+// Assert runs each requireion against the response.
+// It closes the response body after all of the requireions have ran.
 // Assert must be called for every response as it will ensure the body is closed.
 // If you want to continue to reuse the connection, you must read the response body.
 func (r Response) Assert(t testing.TB, assertions ...ResponseAssertion) Response {

@@ -12,7 +12,7 @@ import (
 
 // T represents a test instance.
 // It intentionally does not provide any default request modifiers or
-// default response assertions.
+// default response requireions.
 // Defaults should be explicitly provided to
 // Request and Assert.
 type T struct {

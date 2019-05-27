@@ -8,9 +8,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"go.coder.com/ctest/chttptest"
 
-	"github.com/stretchr/testify/assert"
+	"go.coder.com/m/lib/ctest/chttptest"
 )
 
 func TestBody(t *testing.T) {
@@ -22,7 +21,7 @@ func TestBody(t *testing.T) {
 	byt, err := ioutil.ReadAll(req.Body)
 	require.NoError(t, err)
 
-	assert.Equal(t, []byte("test123"), byt)
+	require.Equal(t, []byte("test123"), byt)
 }
 
 func TestResponse(tt *testing.T) {
@@ -33,7 +32,7 @@ func TestResponse(tt *testing.T) {
 	}))
 	defer close()
 
-	t := New(tt, "http://" + addr)
+	t := New(tt, "http://"+addr)
 
 	req := t.Get(func(t testing.TB, req *http.Request) {
 		req.Body = ioutil.NopCloser(strings.NewReader("howdy"))
@@ -41,7 +40,7 @@ func TestResponse(tt *testing.T) {
 
 	t.Run("DuplicateBody", func(t *T) {
 		for i := 0; i < 4; i++ {
-			assert.Equal(t, "howdy", string(req.Clone(t).Send(t).DuplicateBody(t)))
+			require.Equal(t, "howdy", string(req.Clone(t).Send(t).DuplicateBody(t)))
 		}
 	})
 
@@ -58,7 +57,7 @@ func TestResponse(tt *testing.T) {
 			).Send(t).Assert(
 				t,
 				func(t testing.TB, resp Response) {
-					assert.Equal(t, []byte("a"), resp.DuplicateBody(t))
+					require.Equal(t, []byte("a"), resp.DuplicateBody(t))
 				},
 			)
 		}

@@ -5,8 +5,9 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-	"go.coder.com/ctest/chttptest"
+	"github.com/stretchr/testify/require"
+
+	"go.coder.com/m/lib/ctest/chttptest"
 )
 
 func TestT(tt *testing.T) {
@@ -15,17 +16,17 @@ func TestT(tt *testing.T) {
 	}))
 	defer close()
 
-	t := New(tt, "http://"  + addr)
+	t := New(tt, "http://"+addr)
 
 	t.Run("Run Creates deep copy", func(dt *T) {
 		dt.URL.Path = "testing"
-		assert.NotEqual(t, dt.URL, t.URL)
+		require.NotEqual(t, dt.URL, t.URL)
 	})
 
 	t.Run("RunURL Creates deep copy, and appends to URL", func(t *T) {
 		t.RunPath("/deeper", func(dt *T) {
-			assert.Equal(t, "http://"+addr+"/deeper", dt.URL.String())
-			assert.NotEqual(t, dt.URL, t.URL)
+			require.Equal(t, "http://"+addr+"/deeper", dt.URL.String())
+			require.NotEqual(t, dt.URL, t.URL)
 		})
 	})
 }

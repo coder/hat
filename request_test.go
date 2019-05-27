@@ -5,7 +5,6 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -17,5 +16,5 @@ func TestURLParams(t *testing.T) {
 		"q": []string{"sean"},
 	})(t, req)
 
-	assert.Equal(t, "http://google.com?q=sean", req.URL.String())
+	require.Equal(t, "http://google.com?q=sean", req.URL.String())
 }

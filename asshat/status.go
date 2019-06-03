@@ -1,9 +1,8 @@
 package asshat
 
 import (
+	"net/http"
 	"testing"
-
-	"github.com/stretchr/testify/require"
 
 	"go.coder.com/hat"
 )
@@ -12,6 +11,14 @@ import (
 func StatusEqual(expected int) hat.ResponseAssertion {
 	return func(t testing.TB, r hat.Response) {
 		t.Helper()
-		require.Equal(t, expected, r.StatusCode)
+
+		got := r.StatusCode
+
+		if expected != r.StatusCode {
+			t.Errorf("wanted status %v (%v), got status %v (%v)",
+				expected, http.StatusText(expected),
+				got, http.StatusText(got),
+			)
+		}
 	}
 }

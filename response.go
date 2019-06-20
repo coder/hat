@@ -17,6 +17,9 @@ func CombineResponseAssertions(as ...ResponseAssertion) ResponseAssertion {
 		t.Helper()
 		for _, a := range as {
 			a(t, r)
+			if t.Failed() {
+				t.Fatal("an assertion failed")
+			}
 		}
 	}
 }
@@ -36,6 +39,9 @@ func (r Response) Assert(t testing.TB, assertions ...ResponseAssertion) Response
 
 	for _, a := range assertions {
 		a(t, r)
+		if t.Failed() {
+			t.Fatal("an assertion failed")
+		}
 	}
 
 	return r

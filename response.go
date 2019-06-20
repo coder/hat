@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io/ioutil"
 	"net/http"
+	"net/http/httputil"
 	"testing"
 )
 
@@ -15,12 +16,7 @@ type ResponseAssertion func(t testing.TB, r Response)
 func CombineResponseAssertions(as ...ResponseAssertion) ResponseAssertion {
 	return func(t testing.TB, r Response) {
 		t.Helper()
-		for _, a := range as {
-			a(t, r)
-			if t.Failed() {
-				t.Fatal("an assertion failed")
-			}
-		}
+		r.Assert(t, as...)
 	}
 }
 
@@ -40,7 +36,8 @@ func (r Response) Assert(t testing.TB, assertions ...ResponseAssertion) Response
 	for _, a := range assertions {
 		a(t, r)
 		if t.Failed() {
-			t.Fatal("an assertion failed")
+			b, _ := httputil.DumpResponse(r.Response, true)
+			t.Fatalf("an assertion failed; resp: %s", b)
 		}
 	}
 

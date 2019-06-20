@@ -2,8 +2,10 @@ package hat
 
 import (
 	"bytes"
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"net/http/httputil"
 	"testing"
 )
 
@@ -15,9 +17,7 @@ type ResponseAssertion func(t testing.TB, r Response)
 func CombineResponseAssertions(as ...ResponseAssertion) ResponseAssertion {
 	return func(t testing.TB, r Response) {
 		t.Helper()
-		for _, a := range as {
-			a(t, r)
-		}
+		r.Assert(t, as...)
 	}
 }
 
@@ -36,6 +36,22 @@ func (r Response) Assert(t testing.TB, assertions ...ResponseAssertion) Response
 
 	for _, a := range assertions {
 		a(t, r)
+		if t.Failed() {
+			header, _ := httputil.DumpResponse(r.Response, false)
+
+			t.Errorf("resp:\n%s", header)
+
+			body := r.DuplicateBody(t)
+			fmted := &bytes.Buffer{}
+			err := json.Indent(fmted, body, "", "  ")
+			if err == nil {
+				body = fmted.Bytes()
+			}
+
+			t.Logf("body:\n%s", body)
+
+			t.FailNow()
+		}
 	}
 
 	return r

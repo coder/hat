@@ -87,7 +87,7 @@ func (r Request) Send(t *T) *Response {
 }
 
 // Clone creates a duplicate HTTP request and applies opts to it.
-func (r Request) Clone(t testing.TB, opts ...RequestOption) Request {
+func (r Request) Clone(t *T, opts ...RequestOption) Request {
 	t.Helper()
 	return makeRequest(t, func() *http.Request {
 		t.Helper()

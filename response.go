@@ -6,15 +6,16 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httputil"
+	"testing"
 )
 
 // ResponseAssertion requires a quality of the response.
-type ResponseAssertion func(t *T, r Response)
+type ResponseAssertion func(t testing.TB, r Response)
 
 // CombineResponseAssertions returns a new ResponseAssertion which internally
 // calls each member of requires in the provided order.
 func CombineResponseAssertions(as ...ResponseAssertion) ResponseAssertion {
-	return func(t *T, r Response) {
+	return func(t testing.TB, r Response) {
 		t.Helper()
 		r.Assert(t, as...)
 	}
@@ -29,7 +30,7 @@ type Response struct {
 // It closes the response body after all of the requireions have ran.
 // Assert must be called for every response as it will ensure the body is closed.
 // If you want to continue to reuse the connection, you must read the response body.
-func (r Response) Assert(t *T, assertions ...ResponseAssertion) Response {
+func (r Response) Assert(t testing.TB, assertions ...ResponseAssertion) Response {
 	t.Helper()
 	defer r.Body.Close()
 
@@ -58,7 +59,7 @@ func (r Response) Assert(t *T, assertions ...ResponseAssertion) Response {
 
 // DuplicateBody reads in the response body.
 // It replaces the underlying body with a duplicate.
-func (r Response) DuplicateBody(t *T) []byte {
+func (r Response) DuplicateBody(t testing.TB) []byte {
 	defer r.Body.Close()
 
 	byt, err := ioutil.ReadAll(r.Body)

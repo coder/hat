@@ -8,6 +8,8 @@ It's based on composable, reusable response assertions, and request modifiers. I
 code**, while **improving clarity of test code and test output**. It leans on the standard `net/http` package
 as much as possible.
 
+Import as `go.coder.com/hat`.
+
 ## Example
 
 Let's test that twitter is working:

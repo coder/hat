@@ -158,6 +158,14 @@ the size of the requests or responses.
 hat and asshat maintains a very small base of helpers. We think of the provided helpers as primitives
 for organization and application-specific helpers.
 
+### Always Fatal
+
+While some assertions don't invalidate the test, and would otherwise be `t.Error`s, we don't
+really mind when if they fail the test immediately.
+
+To avoid the API complexity of selecting
+between `Error`s and `Fatal`s, we fatal all the time.
+
 ### testing.TB instead of *hat.T
 
 When porting your code over to hat, it's better to accept a `testing.TB` than a `*hat.T` or a `*testing.T`.

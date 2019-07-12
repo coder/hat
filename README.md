@@ -169,9 +169,9 @@ while clarifying the scope of the helper.
 
 This pattern is used in hat itself. The `ResponseAssertion` type and the `Assert` function accept
 `testing.TB` instead of a concrete `*hat.T` or `*testing.T`. At first glance, it seems like wherever
-the caller is calling a `ResponseAssertion` or `Assert`, they would have a `*hat.T`.
+the caller is using a `ResponseAssertion` or `Assert`, they would have a `*hat.T`.
 
-Actually, this allows consumers to hide the initialization of `hat.T` behind a helper function. E.g:
+In reality, this choice lets consumers hide the initialization of `hat.T` behind a helper function. E.g:
 
 ```go
 func TestSomething(t *testing.T) {

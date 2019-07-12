@@ -22,7 +22,7 @@ func TestAPI(tt *testing.T) {
 
 		req.Send(t).Assert(
 			t,
-			func(t testing.TB, r hat.Response) {
+			func(t *hat.T, r hat.Response) {
 				byt := r.DuplicateBody(t)
 				require.Equal(t, "Hello /", string(byt))
 			},
@@ -33,7 +33,7 @@ func TestAPI(tt *testing.T) {
 				hat.Path("/1234567890"),
 			).Send(t).Assert(
 				t,
-				func(t testing.TB, r hat.Response) {
+				func(t *hat.T, r hat.Response) {
 					byt := r.DuplicateBody(t)
 					require.Equal(t, "Path too long\n", string(byt))
 				},

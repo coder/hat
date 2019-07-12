@@ -2,7 +2,6 @@ package asshat
 
 import (
 	"regexp"
-	"testing"
 
 	"github.com/stretchr/testify/require"
 
@@ -13,7 +12,7 @@ import (
 // Use BodyStringEqual instead of casting `expects` from a string so
 // the error message shows the textual difference.
 func BodyEqual(expects []byte) hat.ResponseAssertion {
-	return func(t testing.TB, r hat.Response) {
+	return func(t *hat.T, r hat.Response) {
 		t.Helper()
 		require.Equal(t, expects, r.DuplicateBody(t))
 	}
@@ -21,7 +20,7 @@ func BodyEqual(expects []byte) hat.ResponseAssertion {
 
 // BodyStringEqual checks if the body equals string expects.
 func BodyStringEqual(expects string) hat.ResponseAssertion {
-	return func(t testing.TB, r hat.Response) {
+	return func(t *hat.T, r hat.Response) {
 		t.Helper()
 		require.Equal(t, expects, string(r.DuplicateBody(t)))
 	}
@@ -32,7 +31,7 @@ func BodyMatches(expr string) hat.ResponseAssertion {
 	// Compiling is expensive, so we do it once.
 	rg, err := regexp.Compile(expr)
 
-	return func(t testing.TB, r hat.Response) {
+	return func(t *hat.T, r hat.Response) {
 		t.Helper()
 		require.NoError(t, err, "failed to compile regex")
 

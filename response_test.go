@@ -15,7 +15,7 @@ func TestBody(t *testing.T) {
 	req, err := http.NewRequest("GET", "google.com", nil)
 	require.NoError(t, err)
 
-	Body(strings.NewReader("test123"))(t, req)
+	Body(strings.NewReader("test123"))(&T{T: t}, req)
 
 	byt, err := ioutil.ReadAll(req.Body)
 	require.NoError(t, err)
@@ -33,7 +33,7 @@ func TestResponse(tt *testing.T) {
 
 	t := New(tt, s.URL)
 
-	req := t.Get(func(t testing.TB, req *http.Request) {
+	req := t.Get(func(t *T, req *http.Request) {
 		req.Body = ioutil.NopCloser(strings.NewReader("howdy"))
 	})
 
@@ -47,7 +47,7 @@ func TestResponse(tt *testing.T) {
 		for i := 0; i < 3; i++ {
 			t.Logf("Iteration %v", i)
 			req.Clone(t,
-				func(t testing.TB, req *http.Request) {
+				func(t *T, req *http.Request) {
 					// Ensure request is being copied for every Again.
 					req.URL.Path += "/a"
 					require.Equal(t, "/a", req.URL.Path)
@@ -55,7 +55,7 @@ func TestResponse(tt *testing.T) {
 				},
 			).Send(t).Assert(
 				t,
-				func(t testing.TB, resp Response) {
+				func(t *T, resp Response) {
 					require.Equal(t, []byte("a"), resp.DuplicateBody(t))
 				},
 			)

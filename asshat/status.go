@@ -1,15 +1,13 @@
 package asshat
 
 import (
-	"net/http"
-	"testing"
-
 	"go.coder.com/hat"
+	"net/http"
 )
 
 // StatusEqual ensures the response status equals expected.
 func StatusEqual(expected int) hat.ResponseAssertion {
-	return func(t testing.TB, r hat.Response) {
+	return func(t *hat.T, r hat.Response) {
 		t.Helper()
 
 		got := r.StatusCode

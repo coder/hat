@@ -162,8 +162,7 @@ for organization and application-specific helpers.
 
 ### Always Fatal
 
-While some assertions don't invalidate the test, and would otherwise be `t.Error`s, we don't
-really mind when if they fail the test immediately.
+While some assertions don't invalidate the test, we typically don't mind if they fail the test immediately.
 
 To avoid the API complexity of selecting
 between `Error`s and `Fatal`s, we fatal all the time.

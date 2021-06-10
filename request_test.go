@@ -6,10 +6,10 @@ import (
 	"net/url"
 	"testing"
 
-	"go.coder.com/hat/asshat"
-
 	"github.com/stretchr/testify/require"
+
 	"go.coder.com/hat"
+	"go.coder.com/hat/asshat"
 )
 
 func TestURLParams(t *testing.T) {

@@ -13,6 +13,8 @@ import (
 )
 
 func TestURLParams(t *testing.T) {
+	t.Parallel()
+
 	req, err := http.NewRequest("GET", "http://google.com", nil)
 	require.NoError(t, err)
 
@@ -24,7 +26,9 @@ func TestURLParams(t *testing.T) {
 }
 
 func TestHeader(tt *testing.T) {
-	hKey, hVal := "X-Custom-Header", "test-value"
+	tt.Parallel()
+
+	const hKey, hVal = "X-Custom-Header", "test-value"
 	// Server returns status code 200 and checks the header is as expected
 	s := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		require.Equal(tt, hVal, req.Header.Get(hKey))

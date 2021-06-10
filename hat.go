@@ -20,6 +20,8 @@ type T struct {
 
 	URL    *url.URL
 	Client *http.Client
+	// persistentOpts are run on every request
+	persistentOpts []RequestOption
 }
 
 // New creates a *T from a *testing.T.
@@ -36,6 +38,10 @@ func New(t *testing.T, baseURL string) *T {
 		URL:    u,
 		Client: client,
 	}
+}
+
+func (t *T) AddPersistentOpts(opts ...RequestOption) {
+	t.persistentOpts = append(t.persistentOpts, opts...)
 }
 
 // Run creates a subtest.

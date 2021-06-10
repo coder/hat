@@ -15,6 +15,13 @@ import (
 // Use the passed t to fail if the option cannot be set.
 type RequestOption func(t testing.TB, req *http.Request)
 
+// Header sets a header on the request.
+func Header(key, value string) RequestOption {
+	return func(_ testing.TB, req *http.Request) {
+		req.Header.Set(key, value)
+	}
+}
+
 // URLParams sets the URL parameters of the request.
 func URLParams(v url.Values) RequestOption {
 	return func(_ testing.TB, req *http.Request) {

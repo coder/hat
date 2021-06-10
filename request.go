@@ -113,6 +113,9 @@ func (t T) Request(method string, opts ...RequestOption) Request {
 			req, err := http.NewRequest(method, t.URL.String(), nil)
 			require.NoError(t, err, "failed to create request")
 
+			for _, pOpt := range t.persistentOpts {
+				pOpt(t, req)
+			}
 			for _, opt := range opts {
 				opt(t, req)
 			}
